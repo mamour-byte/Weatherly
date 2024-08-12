@@ -32,7 +32,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-
         body: [
           const HomePage(),
           const SearchLocation(),
@@ -61,7 +60,9 @@ class _MyAppState extends State<MyApp> {
             ),
           ],
         ),
+
       ),
     );
+
   }
 }

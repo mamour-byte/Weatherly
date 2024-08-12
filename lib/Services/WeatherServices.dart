@@ -1,18 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'dart:convert';
 import '../models/WeatherDot.dart';
 import 'package:http/http.dart' as http;
 
-
-
-
 Image getWeatherIcon(String _icon) {
   String path = 'icons/';
   String imageExtension = ".png";
-  return Image.assets(
+  return Image.asset(
     path + _icon + imageExtension,
-    width: 70,
-    height: 70,
+    width: 150,
+    height: 150,
   );
 }
 
@@ -41,9 +39,9 @@ String getDateFromTimestamp(int timestamp) {
 
 
 
-Future<Weather> getCurrentWeather(Location location) async {
+Future<Weather> getCurrentWeather(String city) async {
   Weather weather;
-  String city = location.city;
+
   String apiKey = "9606444e75b0bd62e4fb9ede031a9d64";
   var url = "https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}";
 
