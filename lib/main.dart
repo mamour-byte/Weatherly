@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:weatherly/pages/HomePage.dart';
 import 'package:weatherly/pages/Maps.dart';
 import 'package:weatherly/pages/Search.dart';
+import 'package:weatherly/Theme/Theme.dart';
 
 
 void main() {
@@ -30,8 +31,13 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.background ,
         body: [
           const HomePage(),
           const SearchLocation(),

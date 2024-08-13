@@ -22,16 +22,15 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text('Dakar ' , style: TextStyle(color: Colors.white),),
-      ),
+
       body: Center(
         child: FutureBuilder<Weather>(
           future: futureWeather,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator(color: Colors.black,);
+              return const CircularProgressIndicator(
+                color: Colors.black,
+              );
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
@@ -39,6 +38,8 @@ class _HomePageState extends State<HomePage> {
 
               return Column(
                 children: [
+                  const SizedBox(height: 20),
+                  const HeaderWidget(),
                   const SizedBox(height: 30),
                   TemperatureWidget(weather: weather),
                   const SizedBox(height: 30),
@@ -54,6 +55,22 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+class HeaderWidget extends StatelessWidget {
+  const HeaderWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.location_on , color: Colors.black,size: 20,),
+        Text('Dakar',style: TextStyle(color:Colors.black , fontWeight: FontWeight.bold,fontSize: 20),)
+      ],
+    );
+  }
+}
+
 
 class TemperatureWidget extends StatelessWidget {
   final Weather weather;
@@ -105,7 +122,7 @@ class WeatherInfoCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
       margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).colorScheme.primary ,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
