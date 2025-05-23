@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../Services/WeatherServices.dart';
 import '../models/WeatherDot.dart';
 
@@ -20,34 +21,38 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-
-      body: Center(
+    return SafeArea(
+      child: Center(
         child: FutureBuilder<Weather>(
           future: futureWeather,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const CircularProgressIndicator(
-                color: Colors.black,
-              );
+              return const CircularProgressIndicator(color: Colors.white);
             } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
+              return Text(
+                'Erreur : ${snapshot.error}',
+                style: const TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              );
             } else if (snapshot.hasData) {
-              Weather weather = snapshot.data!;
-
-              return Column(
-                children: [
-                  const SizedBox(height: 20),
-                  const HeaderWidget(),
-                  const SizedBox(height: 30),
-                  TemperatureWidget(weather: weather),
-                  const SizedBox(height: 30),
-                  WeatherInfoCard(weather: weather),
-                ],
+              final weather = snapshot.data!;
+              return SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
+                child: Column(
+                  children: [
+                    const HeaderWidget(),
+                    const SizedBox(height: 30),
+                    TemperatureWidget(weather: weather),
+                    const SizedBox(height: 30),
+                    WeatherInfoCard(weather: weather),
+                  ],
+                ),
               );
             } else {
-              return const Text('No data available');
+              return const Text(
+                'Aucune donnée',
+                style: TextStyle(color: Colors.white),
+              );
             }
           },
         ),
@@ -64,47 +69,45 @@ class HeaderWidget extends StatelessWidget {
     return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.location_on , color: Colors.black,size: 20,),
-        Text('Dakar',style: TextStyle(color:Colors.black , fontWeight: FontWeight.bold,fontSize: 20),)
+        Icon(Icons.location_on, color: Colors.white, size: 22),
+        SizedBox(width: 5),
+        Text(
+          'Dakar',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+        )
       ],
     );
   }
 }
 
-
 class TemperatureWidget extends StatelessWidget {
   final Weather weather;
 
-  const TemperatureWidget({required this.weather});
+  const TemperatureWidget({required this.weather, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         getWeatherIcon(weather.icon),
+        const SizedBox(height: 10),
         Text(
           weather.description,
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 16,
-          ),
+          style: const TextStyle(color: Colors.white, fontSize: 18),
         ),
         const SizedBox(height: 10),
         Text(
           "${weather.temp.toInt()}°",
           style: const TextStyle(
-            color: Colors.black,
-            fontSize: 50,
+            color: Colors.white,
+            fontSize: 60,
             fontWeight: FontWeight.bold,
           ),
         ),
         const SizedBox(height: 5),
         Text(
-          "Feels like ${weather.feelsLike.toInt()}°",
-          style: const TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-          ),
+          "Ressenti ${weather.feelsLike.toInt()}°",
+          style: const TextStyle(color: Colors.white70, fontSize: 18),
         ),
       ],
     );
@@ -114,40 +117,34 @@ class TemperatureWidget extends StatelessWidget {
 class WeatherInfoCard extends StatelessWidget {
   final Weather weather;
 
-  const WeatherInfoCard({required this.weather});
+  const WeatherInfoCard({required this.weather, super.key});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 25),
-      margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+      padding: const EdgeInsets.all(20),
+      margin: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.primary ,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
+        color: Colors.white.withOpacity(0.15),
+        borderRadius: BorderRadius.circular(25),
+        border: Border.all(color: Colors.white.withOpacity(0.3)),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildWeatherInfoItem(
-            imageUrl: 'https://cdn-icons-png.flaticon.com/128/2011/2011448.png',
-            label: "Wind",
+            iconAsset: 'assets/icons/wind.svg',
+            label: 'Vent',
             value: "${weather.wind} km/h",
           ),
           _buildWeatherInfoItem(
-            imageUrl: 'https://cdn-icons-png.flaticon.com/128/5664/5664979.png',
-            label: "Humidity",
+            iconAsset: 'assets/icons/humidity.svg',
+            label: 'Humidité',
             value: "${weather.humidity.toInt()}%",
           ),
           _buildWeatherInfoItem(
-            imageUrl: 'https://cdn-icons-png.flaticon.com/128/4745/4745257.png',
-            label: "Pressure",
+            iconAsset: 'assets/icons/pressure.svg',
+            label: 'Pression',
             value: "${weather.pressure} hPa",
           ),
         ],
@@ -156,40 +153,18 @@ class WeatherInfoCard extends StatelessWidget {
   }
 
   Widget _buildWeatherInfoItem({
-    required String imageUrl,
+    required String iconAsset,
     required String label,
     required String value,
   }) {
-    return Expanded(
-      child: Column(
-        children: [
-          Image.network(
-            imageUrl,
-            cacheHeight: 25,
-            cacheWidth: 25,
-          ),
-          const SizedBox(height: 5),
-          Text(
-            label,
-            textAlign: TextAlign.left,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-              color: Colors.grey,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            value,
-            textAlign: TextAlign.left,
-            style: const TextStyle(
-              fontWeight: FontWeight.w700,
-              fontSize: 15,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
+    return Column(
+      children: [
+        SvgPicture.asset(iconAsset, height: 30, color: Colors.white),
+        const SizedBox(height: 8),
+        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
+        const SizedBox(height: 4),
+        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+      ],
     );
   }
 }
