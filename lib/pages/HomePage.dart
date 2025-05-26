@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import '../Services/WeatherServices.dart';
 import '../models/WeatherDot.dart';
 
@@ -12,11 +11,23 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<Weather> futureWeather;
+  String currentCity = "Dakar";
 
   @override
   void initState() {
     super.initState();
-    futureWeather = getCurrentWeather("Dakar");
+    futureWeather = getCurrentWeather(currentCity);
+  }
+
+  void _openSearchPage() async {
+    final selectedCity = await Navigator.pushNamed(context, '/search');
+
+    if (selectedCity != null && selectedCity is String) {
+      setState(() {
+        currentCity = selectedCity;
+        futureWeather = getCurrentWeather(currentCity);
+      });
+    }
   }
 
   @override
@@ -40,7 +51,7 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
                 child: Column(
                   children: [
-                    const HeaderWidget(),
+                    HeaderWidget(city: currentCity, onSearch: _openSearchPage),
                     const SizedBox(height: 30),
                     TemperatureWidget(weather: weather),
                     const SizedBox(height: 30),
@@ -61,24 +72,34 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
+
 class HeaderWidget extends StatelessWidget {
-  const HeaderWidget({super.key});
+  final String city;
+  final VoidCallback onSearch;
+
+  const HeaderWidget({required this.city, required this.onSearch, super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Row(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        Icon(Icons.location_on, color: Colors.white, size: 22),
-        SizedBox(width: 5),
+        const Icon(Icons.location_on, color: Colors.white, size: 22),
+        const SizedBox(width: 5),
         Text(
-          'Dakar',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+          city,
+          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        const SizedBox(width: 10),
+        IconButton(
+          onPressed: onSearch,
+          icon: const Icon(Icons.search, color: Colors.white),
         )
       ],
     );
   }
 }
+
 
 class TemperatureWidget extends StatelessWidget {
   final Weather weather;
@@ -133,17 +154,14 @@ class WeatherInfoCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildWeatherInfoItem(
-            iconAsset: 'assets/icons/wind.svg',
             label: 'Vent',
             value: "${weather.wind} km/h",
           ),
           _buildWeatherInfoItem(
-            iconAsset: 'assets/icons/humidity.svg',
             label: 'Humidité',
             value: "${weather.humidity.toInt()}%",
           ),
           _buildWeatherInfoItem(
-            iconAsset: 'assets/icons/pressure.svg',
             label: 'Pression',
             value: "${weather.pressure} hPa",
           ),
@@ -153,13 +171,11 @@ class WeatherInfoCard extends StatelessWidget {
   }
 
   Widget _buildWeatherInfoItem({
-    required String iconAsset,
     required String label,
     required String value,
   }) {
     return Column(
       children: [
-        SvgPicture.asset(iconAsset, height: 30, color: Colors.white),
         const SizedBox(height: 8),
         Text(label, style: const TextStyle(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 4),

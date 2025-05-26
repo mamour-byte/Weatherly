@@ -41,7 +41,7 @@ class _MyAppState extends State<MyApp> {
       ),
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        extendBody: true, // Pour que la nav bar chevauche un peu le body (effet glassmorphisme)
+        extendBody: true,
         body: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

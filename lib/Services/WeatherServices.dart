@@ -74,3 +74,58 @@ Future getForecast(Location location) async {
 }
 
 
+Future<List<Map<String, dynamic>>> getCitySuggestions(String query) async {
+  const String apiKey = "9606444e75b0bd62e4fb9ede031a9d64";
+  final url = Uri.parse(
+    "http://api.openweathermap.org/geo/1.0/direct?q=$query&limit=5&appid=$apiKey",
+  );
+
+  final response = await http.get(url);
+
+  if (response.statusCode == 200) {
+    List<dynamic> cities = jsonDecode(response.body);
+    return cities.map<Map<String, dynamic>>((city) => {
+      'name': city['name'],
+      'country': city['country'],
+      'lat': city['lat'],
+      'lon': city['lon'],
+      'state': city['state'],
+    }).toList();
+  } else {
+    throw Exception('Failed to fetch city suggestions');
+  }
+}
+
+
+String getWeatherTileUrl({
+  required String layer,
+  required String apiKey,
+}) {
+  return "https://tile.openweathermap.org/map/$layer/{z}/{x}/{y}.png?appid=$apiKey";
+}
+
+Future<Map<String, dynamic>> getCityWeather(String city) async {
+  String apiKey = "9606444e75b0bd62e4fb9ede031a9d64";
+  final url =
+      "https://api.openweathermap.org/data/2.5/weather?q=$city&appid=$apiKey&units=metric";
+
+  final response = await http.get(Uri.parse(url));
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return {
+      "lat": data["coord"]["lat"],
+      "lon": data["coord"]["lon"],
+      "temp": data["main"]["temp"],
+      "name": data["name"],
+    };
+  } else {
+    throw Exception("Ville introuvable : $city");
+  }
+}
+
+
+
+
+
+
